@@ -6,7 +6,7 @@ package de.uni_trier.wi2.pki.io.attr;
 
 public class ContinuousCSVAttribute implements CSVAttribute{
 
-    private double value;
+    public double value;
 
     public ContinuousCSVAttribute( double value) {
         this.value = value;
@@ -16,7 +16,7 @@ public class ContinuousCSVAttribute implements CSVAttribute{
     public void setValue(Object value) { this.value = (double) value; }
 
     @Override
-    public Object getValue() { return value; }
+    public Object getValue() { return this.value; }
 
     @Override
     public int compareTo(Object o) {

@@ -3,7 +3,7 @@ package de.uni_trier.wi2.pki.io.attr;
 import java.util.StringTokenizer;
 
 public class CategoricalCSVAttribute implements CSVAttribute{
-    private String value;
+    public String value;
 
     public CategoricalCSVAttribute( String value){
         this.value = value;

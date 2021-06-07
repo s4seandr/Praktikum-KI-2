@@ -19,6 +19,21 @@ public class EntropyUtils {
      * @return the information gain for each attribute
      */
     public static List<Double> calcInformationGain(Collection<CSVAttribute[]> matrix, int labelIndex) {
+        double p = 0;
+        double n = 0;
+        List<CSVAttribute[]> matrixx = (List<CSVAttribute[]>) matrix;
+
+        for( int i = 0; i < matrix.size(); i++ ){
+            if( (double) matrixx.get(i)[labelIndex].getValue() == 1 ){
+                p++;
+                n++;
+            }else{
+                n++;
+            }
+        }
+
+        double entropy = -p/(p+n) * (Math.log(p/(p+n))/Math.log(2)) - n/(p+n) * (Math.log(n/(p+n))/Math.log(2));
+
         return null;
     }
 

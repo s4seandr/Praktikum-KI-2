@@ -4,6 +4,8 @@ import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.CategoricalCSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.ContinuousCSVAttribute;
+import de.uni_trier.wi2.pki.preprocess.BinningDiscretizer;
+import de.uni_trier.wi2.pki.util.EntropyUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,9 +20,13 @@ public class Main {
         List<CSVAttribute[]> csvList;
 
         csvList = buildList(input);
+        System.out.println( csvList.get(0)[0].getValue() );
 
-        System.out.println();
-        System.out.println(csvList.get(0)[0].getValue());
+        BinningDiscretizer.discretize(5, csvList, 0);
+        System.out.println( csvList.get(0)[0].getValue() );
+
+        EntropyUtils.calcInformationGain(csvList, 0);
+
 
     }
 
@@ -33,23 +39,23 @@ public class Main {
         for( int i = 0; i < list.size(); i++){
             CSVAttribute[] row = new CSVAttribute[listLength];
             for( int j = 0; j < listLength; j++){
-                double value;
-                String strvalue;
+                double doublevalue;
+                String stringvalue;
+                boolean b = true;
 
                 try{
-                    value = Double.parseDouble(list.get(i)[j]);
-                    CSVAttribute<ContinuousCSVAttribute> attribute = new ContinuousCSVAttribute(value);
-                    attribute.setValue(new ContinuousCSVAttribute(value));
-                    row[j] = attribute;
+                        doublevalue = Double.parseDouble(list.get(i)[j]);
+                        CSVAttribute<ContinuousCSVAttribute> attribute = new ContinuousCSVAttribute(doublevalue);
+                        row[j] = attribute;
                 } catch (Exception e){
-                    strvalue = list.get(i)[j];
-                    CSVAttribute<CategoricalCSVAttribute> attribute = new CategoricalCSVAttribute(strvalue);
-                    attribute.setValue(new CategoricalCSVAttribute(strvalue));
+                    stringvalue = list.get(i)[j];
+                    CSVAttribute<CategoricalCSVAttribute> attribute = new CategoricalCSVAttribute(stringvalue);
                     row[j] = attribute;
                 }
             }
             csvList.add(row);
         }
+
         return csvList;
     }
 
