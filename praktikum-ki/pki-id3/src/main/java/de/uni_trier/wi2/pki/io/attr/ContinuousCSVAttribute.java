@@ -42,4 +42,19 @@ public class ContinuousCSVAttribute implements CSVAttribute{
     public Object clone() {
         return null;
     }
+
+    @Override
+    public String toString(){
+        return Double.toString(this.value);
+    }
+
+    @Override
+    public boolean equals( Object that){
+        if (that instanceof ContinuousCSVAttribute) {
+            if(this.value == (double) ((ContinuousCSVAttribute) that).getValue() ){
+                return true;
+            }
+        }
+        return false;
+    }
 }

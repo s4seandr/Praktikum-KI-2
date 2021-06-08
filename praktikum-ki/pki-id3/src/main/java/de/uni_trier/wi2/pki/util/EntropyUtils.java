@@ -26,12 +26,12 @@ public class EntropyUtils {
         double n = 0;
         List<CSVAttribute[]> matrixx = (List<CSVAttribute[]>) matrix;
 
-        for( int i = 0; i < matrix.size(); i++ ){
-            if( (double) matrixx.get(i)[labelIndex].getValue() == 1 ){
-                p++;
-            }else{
-                n++;
-            }
+        for( int i = 0; i < matrixx.size(); i++ ){
+                if ( matrixx.get(i)[labelIndex].getValue().equals("1")) {
+                    p++;
+                }else{
+                    n++;
+                }
         }
         double entropy = -p/(p+n) * (Math.log(p/(p+n))/Math.log(2)) - n/(p+n) * (Math.log(n/(p+n))/Math.log(2));
         return entropy;
@@ -41,34 +41,25 @@ public class EntropyUtils {
         double restentropy = 0.0;
         HashMap<CSVAttribute, Integer> map = distinctAttributeValues(matrix, attribute, labelIndex);
         for( CSVAttribute distinctValue : map.keySet()){
-            try {
-                restentropy += ( (double) distinctValue.getValue() / matrix.size() ) * calculateDistinctEntropy(matrix, attribute, labelIndex, distinctValue);
-            }catch(Exception e){
                 restentropy += ( (double) map.get(distinctValue) / matrix.size() ) * calculateDistinctEntropy(matrix, attribute, labelIndex, distinctValue);
-            }
+
         }
         return restentropy;
     }
 
     public static double calculateDistinctEntropy(Collection<CSVAttribute[]> matrix, int attribute, int labelIndex, CSVAttribute distinctValue) {
-        double p = 0;
-        double n = 0;
-        long positives = 0;
-        long negatives = 0;
+        long p = 0;
+        long n = 0;
 
-        for (CSVAttribute[] t : matrix) {
-            if ( t[attribute].compareTo(distinctValue) == 0 || distinctValue.getValue() == null){
-                if ((double) t[labelIndex].getValue() == 1.0){ positives++; }
-                else{ negatives++; }
+        for (CSVAttribute[] row : matrix) {
+            if ( row[attribute].compareTo(distinctValue) == 0){
+                if ( row[labelIndex].getValue().equals("1")){ p++; }
+                else{ n++; }
             }
         }
-        long[] counts = new long[]{positives, negatives};
-        if (counts.length > 0){ p = counts[0]; }
-        if (counts.length > 1){ n = counts[1]; }
-        if (positives == 0 || negatives == 0){ return 0; }
-        double entropy = -p/(p+n) * (Math.log(p/(p+n))/Math.log(2)) - n/(p+n) * (Math.log(n/(p+n))/Math.log(2));
+        if (p == 0 || n == 0){ return 0; }
+        return  -p/(p+n) * (Math.log(p/(p+n))/Math.log(2)) - n/(p+n) * (Math.log(n/(p+n))/Math.log(2));
 
-        return entropy;
     }
 
     public static HashMap<CSVAttribute, Integer> distinctAttributeValues(Collection<CSVAttribute[]> matrix, int attribute, int labelIndex) {
@@ -87,6 +78,14 @@ public class EntropyUtils {
             }
         }
         return map;
+    }
+
+    public static void printMap(Map mp) {
+        Iterator it = mp.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            System.out.println(pair.getKey() + " = " + pair.getValue());
+        }
     }
 
     public static List<Double> calcInformationGain(Collection<CSVAttribute[]> matrix, int labelIndex) {

@@ -26,7 +26,9 @@ public class Main {
         System.out.println( csvList.get(0)[0].getValue() );
 
         //EntropyUtils.calcInformationGain(csvList, 0);
-        System.out.println( EntropyUtils.calcInformationGain(csvList, 8));
+        //System.out.println( EntropyUtils.calcInformationGain(csvList, 10));
+
+        EntropyUtils.printMap(EntropyUtils.distinctAttributeValues(csvList,0,10));
 
 
     }

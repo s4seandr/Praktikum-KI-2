@@ -33,4 +33,19 @@ public class CategoricalCSVAttribute implements CSVAttribute {
         }
         return -1;
     }
+
+    @Override
+    public String toString(){
+        return this.value;
+    }
+
+    @Override
+    public boolean equals( Object that){
+        if (that instanceof CategoricalCSVAttribute) {
+            if(this.value.equals(((CategoricalCSVAttribute) that).getValue()) ){
+                return true;
+            }
+        }
+        return false;
+    }
 }
