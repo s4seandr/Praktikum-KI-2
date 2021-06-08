@@ -57,7 +57,7 @@ public class EntropyUtils {
         long negatives = 0;
 
         for (CSVAttribute[] t : matrix) {
-            if ( t[attribute].getValue() == distinctValue.getValue() || distinctValue.getValue() == null){
+            if ( t[attribute].compareTo(distinctValue) == 0 || distinctValue.getValue() == null){
                 if ((double) t[labelIndex].getValue() == 1.0){ positives++; }
                 else{ negatives++; }
             }
@@ -65,8 +65,9 @@ public class EntropyUtils {
         long[] counts = new long[]{positives, negatives};
         if (counts.length > 0){ p = counts[0]; }
         if (counts.length > 1){ n = counts[1]; }
+        if (positives == 0 || negatives == 0){ return 0; }
         double entropy = -p/(p+n) * (Math.log(p/(p+n))/Math.log(2)) - n/(p+n) * (Math.log(n/(p+n))/Math.log(2));
-        
+
         return entropy;
     }
 
@@ -75,7 +76,7 @@ public class EntropyUtils {
         for (CSVAttribute[] row : matrix) {
             int i = 0;
             for (CSVAttribute distinctValue : map.keySet()) {
-                if (row[attribute].equals(distinctValue)) {
+                if (row[attribute].getValue() == distinctValue.getValue()) {
                     map.put(distinctValue, map.get(distinctValue) + 1);
                     break;
                 }
