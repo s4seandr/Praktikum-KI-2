@@ -1,5 +1,6 @@
 package de.uni_trier.wi2.pki.io.attr;
 
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 public class CategoricalCSVAttribute implements CSVAttribute {
@@ -21,7 +22,7 @@ public class CategoricalCSVAttribute implements CSVAttribute {
 
     @Override
     public Object clone() {
-        return null;
+        return new CategoricalCSVAttribute(this.value);
     }
 
     @Override
@@ -47,5 +48,10 @@ public class CategoricalCSVAttribute implements CSVAttribute {
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

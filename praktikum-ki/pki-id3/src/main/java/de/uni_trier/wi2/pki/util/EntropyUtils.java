@@ -1,16 +1,82 @@
 package de.uni_trier.wi2.pki.util;
 
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
+import de.uni_trier.wi2.pki.io.attr.CategoricalCSVAttribute;
 
 import java.util.*;
-
-import static javafx.scene.input.KeyCode.S;
-import static javafx.scene.input.KeyCode.T;
 
 /**
  * Contains methods that help with computing the entropy.
  */
 public class EntropyUtils {
+
+    private static double log2(double value) {
+        return Math.log(value) / Math.log(2);
+    }
+
+    private static int[] getPandN(Collection<CSVAttribute[]> matrix, int labelIndex) {
+        int p = 0;
+        int n = 0;
+        for(CSVAttribute[] row : matrix) {
+            if (row[labelIndex].equals(new CategoricalCSVAttribute("1"))) p++;
+            else n++;
+        }
+        return new int[]{p,n};
+    }
+
+    private static int[] getPandNforValues(Collection<CSVAttribute[]> matrix, int labelIndex, int attribute, CSVAttribute distinctValue) {
+        int p = 0;
+        int n = 0;
+
+        for (CSVAttribute[] row : matrix) {
+            if ( row[attribute].equals(distinctValue)){
+                if ( row[labelIndex].equals(new CategoricalCSVAttribute("1"))) p++;
+                else n++;
+            }
+        }
+        return new int[]{p,n};
+    }
+
+    public static double calculateEntropy(int p, int n){
+        if (p == 0 || n == 0) return 0;
+        return (double) -p/(p+n) * log2((double) p/(p+n)) - (double) n/(p+n) * log2((double) n/(p+n));
+    }
+
+    public static double calculateResidualEntropy(Collection<CSVAttribute[]> matrix, int attribute, int labelIndex){
+        double residualEntropy = 0.0;
+        int occurrences;
+        int total = matrix.size();
+        HashMap<CSVAttribute, Integer> valueDomainCountMap = getAttributeValueDomain(matrix, attribute);
+        for( CSVAttribute distinctValue : valueDomainCountMap.keySet()){
+            occurrences = valueDomainCountMap.get(distinctValue);
+            int[] pn = getPandNforValues(matrix, labelIndex, attribute, distinctValue);
+            residualEntropy += ( (double) occurrences / total) * calculateEntropy(pn[0], pn[1]);
+        }
+        return residualEntropy;
+    }
+
+    public static  HashMap<CSVAttribute, Integer> getAttributeValueDomain(Collection<CSVAttribute[]> matrix, int attribute) {
+
+        HashSet<CSVAttribute> valueDomain = new HashSet<>();
+        HashMap<CSVAttribute, Integer> valueDomainCountMap = new HashMap<>();
+
+        for (CSVAttribute[] row : matrix) {
+            CSVAttribute value = row[attribute];
+            if (valueDomain.add(value)) {
+                // does not exist yet
+                valueDomainCountMap.put(value, 1);
+            } else {
+                // already exists
+                valueDomainCountMap.put(value, (valueDomainCountMap.get(value)) + 1);
+            }
+        }
+        return valueDomainCountMap;
+    }
+
+    public static void printHashMap(HashMap<CSVAttribute, Integer> valueDomainCountMap) {
+        for(CSVAttribute value : valueDomainCountMap.keySet())
+            System.out.println(value.toString() + ": " + valueDomainCountMap.get(value));
+    }
 
     /**
      * Calculates the information gain for all attributes
@@ -20,81 +86,15 @@ public class EntropyUtils {
      *                   football, than labelIndex is 2
      * @return the information gain for each attribute
      */
-
-    public static double calculateEntropy(Collection<CSVAttribute[]> matrix, int labelIndex){
-        double p = 0;
-        double n = 0;
-        List<CSVAttribute[]> matrixx = (List<CSVAttribute[]>) matrix;
-
-        for( int i = 0; i < matrixx.size(); i++ ){
-                if ( matrixx.get(i)[labelIndex].getValue().equals("1")) {
-                    p++;
-                }else{
-                    n++;
-                }
-        }
-        double entropy = -p/(p+n) * (Math.log(p/(p+n))/Math.log(2)) - n/(p+n) * (Math.log(n/(p+n))/Math.log(2));
-        return entropy;
-    }
-
-    public static double calculateRestentropy(Collection<CSVAttribute[]> matrix, int attribute, int labelIndex){
-        double restentropy = 0.0;
-        HashMap<CSVAttribute, Integer> map = distinctAttributeValues(matrix, attribute, labelIndex);
-        for( CSVAttribute distinctValue : map.keySet()){
-                restentropy += ( (double) map.get(distinctValue) / matrix.size() ) * calculateDistinctEntropy(matrix, attribute, labelIndex, distinctValue);
-
-        }
-        return restentropy;
-    }
-
-    public static double calculateDistinctEntropy(Collection<CSVAttribute[]> matrix, int attribute, int labelIndex, CSVAttribute distinctValue) {
-        long p = 0;
-        long n = 0;
-
-        for (CSVAttribute[] row : matrix) {
-            if ( row[attribute].compareTo(distinctValue) == 0){
-                if ( row[labelIndex].getValue().equals("1")){ p++; }
-                else{ n++; }
-            }
-        }
-        if (p == 0 || n == 0){ return 0; }
-        return  -p/(p+n) * (Math.log(p/(p+n))/Math.log(2)) - n/(p+n) * (Math.log(n/(p+n))/Math.log(2));
-
-    }
-
-    public static HashMap<CSVAttribute, Integer> distinctAttributeValues(Collection<CSVAttribute[]> matrix, int attribute, int labelIndex) {
-        HashMap<CSVAttribute, Integer> map = new HashMap<>();
-        for (CSVAttribute[] row : matrix) {
-            int i = 0;
-            for (CSVAttribute distinctValue : map.keySet()) {
-                if (row[attribute].getValue() == distinctValue.getValue()) {
-                    map.put(distinctValue, map.get(distinctValue) + 1);
-                    break;
-                }
-                i++;
-            }
-            if (i == map.keySet().size()) {
-                map.put(row[attribute], 1);
-            }
-        }
-        return map;
-    }
-
-    public static void printMap(Map mp) {
-        Iterator it = mp.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
-        }
-    }
-
     public static List<Double> calcInformationGain(Collection<CSVAttribute[]> matrix, int labelIndex) {
-        List<Double> gain = new ArrayList<Double>();
-        double entropy = calculateEntropy(matrix,labelIndex);
+        List<Double> gain = new ArrayList<>();
+
+        int[] pn = getPandN(matrix, labelIndex);
+        double entropy = calculateEntropy(pn[0], pn[1]);
 
         for( int attribute = 0; attribute < labelIndex; attribute++) {
-            double restentropy = calculateRestentropy(matrix, attribute, labelIndex);
-            gain.add(entropy - restentropy);
+            double residualEntropy = calculateResidualEntropy(matrix, attribute, labelIndex);
+            gain.add(entropy - residualEntropy);
         }
 
         return gain;

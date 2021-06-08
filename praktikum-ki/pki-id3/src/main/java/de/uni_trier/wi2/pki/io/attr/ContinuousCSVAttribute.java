@@ -1,6 +1,7 @@
 package de.uni_trier.wi2.pki.io.attr;
 
-import javafx.css.CssMetaData;
+
+import java.util.Objects;
 
 /**
  * TODO: Generalize
@@ -15,7 +16,9 @@ public class ContinuousCSVAttribute implements CSVAttribute{
     }
 
     @Override
-    public void setValue(Object value) { this.value = (double) value; }
+    public void setValue(Object value) {
+        this.value = (double) value;
+    }
 
     @Override
     public Object getValue() { return this.value; }
@@ -40,7 +43,7 @@ public class ContinuousCSVAttribute implements CSVAttribute{
 
     @Override
     public Object clone() {
-        return null;
+        return new ContinuousCSVAttribute(this.value);
     }
 
     @Override
@@ -56,5 +59,10 @@ public class ContinuousCSVAttribute implements CSVAttribute{
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

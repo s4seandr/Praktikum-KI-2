@@ -5,6 +5,7 @@ import de.uni_trier.wi2.pki.io.attr.CategoricalCSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.ContinuousCSVAttribute;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,31 +21,45 @@ public class BinningDiscretizer {
      * @param attributeId  The ID of the attribute to discretize.
      * @return the list of discretized examples.
      */
-    public static List<CSVAttribute[]> discretize(int numberOfBins, List<CSVAttribute[]> examples, int attributeId) {
-        double min = (double) examples.get(0)[attributeId].getValue();
-        double max = (double) examples.get(0)[attributeId].getValue();
+    public List<CSVAttribute[]> discretize(int numberOfBins, List<CSVAttribute[]> examples, int attributeId) {
 
-        for( int i = 0; i < examples.size(); i++){
-            if( (double) examples.get(i)[attributeId].getValue() < min ){
-                min = (double) examples.get(i)[attributeId].getValue();
-            }
-            if( (double) examples.get(i)[attributeId].getValue() > max ){
-                max = (double) examples.get(i)[attributeId].getValue();
-            }
+        ContinuousCSVAttribute min;
+        ContinuousCSVAttribute max;
+        ContinuousCSVAttribute value;
+        double binWidth;
+
+        // if not continuous return
+        if (!(examples.get(0)[attributeId] instanceof ContinuousCSVAttribute)) {
+            return examples;
         }
 
-        double range = (max - min) / numberOfBins;
+        // start with first
+        min = (ContinuousCSVAttribute) examples.get(0)[attributeId].clone();
+        max = (ContinuousCSVAttribute) examples.get(0)[attributeId].clone();
 
-        for( int i = 0; i < examples.size(); i++){
-            for( int j = 1; j <= numberOfBins; j++) {
-                if (min + (range * j) >= (double) examples.get(i)[attributeId].getValue()) {
-                    examples.get(i)[attributeId].setValue( (double) j);
+        // find min and max
+        for (CSVAttribute[] row : examples){
+            value = (ContinuousCSVAttribute) row[attributeId];
+            if (value.compareTo(min) < 0) min.setValue(value.getValue());
+            if (value.compareTo(max) > 0) max.setValue(value.getValue());
+        }
+
+        binWidth = ((double) max.getValue() - (double) min.getValue()) / numberOfBins;
+
+        // discretize
+        for (CSVAttribute[] row : examples) {
+            value = (ContinuousCSVAttribute) row[attributeId];
+            double minValue = (double) min.getValue();
+
+            for( int i = 1; i <= numberOfBins; i++) {
+                if (minValue + (binWidth * i) >= (double) value.getValue()) {
+                    value.setValue((double) i);
                     break;
                 }
             }
         }
 
-        return null;
+        return examples;
     }
 
 }
