@@ -1,5 +1,7 @@
 package de.uni_trier.wi2.pki.io.attr;
 
+import javafx.css.CssMetaData;
+
 /**
  * TODO: Generalize
  */
@@ -20,7 +22,20 @@ public class ContinuousCSVAttribute implements CSVAttribute{
 
     @Override
     public int compareTo(Object o) {
-        return 0;
+        if(o instanceof ContinuousCSVAttribute) {
+            if (this.value < (double) ((CSVAttribute) o).getValue() ){
+                return -1;
+            }
+            if (this.value == (double) ((CSVAttribute) o).getValue() ){
+                return 0;
+            }
+            if (this.value > (double) ((CSVAttribute) o).getValue() ){
+                return 1;
+            }
+        }else {
+            throw new ClassCastException();
+        }
+        return -1;
     }
 
     @Override

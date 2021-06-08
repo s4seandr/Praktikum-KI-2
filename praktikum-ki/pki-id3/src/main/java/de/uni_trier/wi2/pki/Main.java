@@ -25,7 +25,8 @@ public class Main {
         BinningDiscretizer.discretize(5, csvList, 0);
         System.out.println( csvList.get(0)[0].getValue() );
 
-        EntropyUtils.calcInformationGain(csvList, 0);
+        //EntropyUtils.calcInformationGain(csvList, 0);
+        System.out.println( EntropyUtils.calcInformationGain(csvList, 8));
 
 
     }
@@ -38,7 +39,7 @@ public class Main {
         }
         for( int i = 0; i < list.size(); i++){
             CSVAttribute[] row = new CSVAttribute[listLength];
-            for( int j = 0; j < listLength; j++){
+            for( int j = 0; j < listLength-1; j++){
                 double doublevalue;
                 String stringvalue;
                 boolean b = true;
@@ -53,6 +54,10 @@ public class Main {
                     row[j] = attribute;
                 }
             }
+            int j = listLength-1;
+            String stringvalue = list.get(i)[j];
+            CSVAttribute<CategoricalCSVAttribute> attribute = new CategoricalCSVAttribute(stringvalue);
+            row[j] = attribute;
             csvList.add(row);
         }
 
