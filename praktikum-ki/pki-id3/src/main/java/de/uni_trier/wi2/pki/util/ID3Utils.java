@@ -4,6 +4,8 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.CategoricalCSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -44,51 +46,86 @@ public class ID3Utils {
      * @return The root node of the decision tree
      */
     public static DecisionTreeNode createTree(Collection<CSVAttribute[]> examples, int labelIndex) {
-
+        // Create a root node for the tree
         DecisionTreeNode node = new DecisionTreeNode();
 
-        // TODO: recursion anchor
-            // all positive
-            if (!hasNegatives(examples, labelIndex)) {
-                node.setLabel(false);
-                return node;
-                // TODO: set label to -
-            }
+        // If all examples are positive, Return the single-node tree Root, with label = +.
+        if (!hasNegatives(examples, labelIndex)) {
+            node.setLabel("1");
+            return node;
+        }
 
-            // all negative
-            if (!hasPositives(examples, labelIndex)) {
-                node.setLabel(true);
-                return node;
-                // TODO:  set label to +
-            }
+        // If all examples are negative, Return the single-node tree Root, with label = -.
+        if (!hasPositives(examples, labelIndex)) {
+            node.setLabel("0");
+            return node;
+        }
 
-            if (examples.isEmpty()) {
-                boolean foundPositiveLabel;
-                int positiveLabel = 0;
-                int negativeLabel = 0;
-                for(CSVAttribute[] row : examples) {
-                    foundPositiveLabel = row[labelIndex].equals(new CategoricalCSVAttribute("1"));
-                    if (foundPositiveLabel) positiveLabel++;
-                    else negativeLabel++;
-                }
-                if( positiveLabel > negativeLabel ){
-                    node.setLabel(true);
-                }else{ node.setLabel(false); }
-                return node;
-                // TODO: set label to most common value of labelAttribute
-            }
+        // If number of predicting attributes is empty, then Return the single node tree Root,
+        // with label = most common value of the target attribute in the examples.
+        if (((List<CSVAttribute[]>) examples).get(0).length == 1) {
+            node.setLabel(getMostCommonLabel(examples, labelIndex));
+            return node;
+        }
 
-            int maxInfoGainAttr = getMostEfficientAttribute(examples, labelIndex);
-            node.setAttributeIndex(maxInfoGainAttr);
-            HashMap<CSVAttribute, Integer> valueDomain = EntropyUtils.getAttributeValueDomain(examples, maxInfoGainAttr);
+        // A ← The Attribute that best classifies examples.
+        int maxInfoGainAttr = getMostEfficientAttribute(examples, labelIndex);
+        // Decision Tree attribute for Root = A.
+        node.setAttributeIndex(maxInfoGainAttr);
 
-            for (CSVAttribute value : valueDomain.keySet()) {
+        // adjust label index to account for removed attribute
+        if (maxInfoGainAttr < labelIndex) labelIndex--;
 
-                DecisionTreeNode child = createTree(examples, labelIndex); // TODO: create tree with correct partition
+        // For each possible value, vi, of A,
+        HashMap<CSVAttribute, Integer> valueDomain = EntropyUtils.getAttributeValueDomain(examples,
+                maxInfoGainAttr);
+        for (CSVAttribute value : valueDomain.keySet()) {
+
+            // Let Examples(vi) be the subset of examples that have the value vi for A
+            Collection<CSVAttribute[]> partitionedExamples = partitionExamples(examples, maxInfoGainAttr,
+                    value.toString());
+
+            // If Examples(vi) is empty
+            if (partitionedExamples.isEmpty()) {
+                // Then below this new branch add a leaf node with label = most common target value in the examples
+                DecisionTreeNode leaf = new DecisionTreeNode();
+                leaf.setLabel(getMostCommonLabel(examples, labelIndex));
+                leaf.setParent(node);
+                node.addSplit(value.toString(), leaf);
+                return leaf;
+
+            } else {
+                // Else below this new branch add the subtree ID3 (Examples(vi), Target_Attribute, Attributes – {A})
+                DecisionTreeNode child = createTree(partitionedExamples, labelIndex);
                 child.setParent(node);
                 node.addSplit(value.toString(), child);
             }
+        }
+
         return node;
+    }
+
+    private static String getMostCommonLabel(Collection<CSVAttribute[]> examples, int labelIndex) {
+        int positiveCount = 0;
+        int negativeCount = 0;
+
+        for(CSVAttribute[] row : examples) {
+            if (row[0].equals(new CategoricalCSVAttribute("1"))) positiveCount++;
+            else negativeCount++;
+        }
+        if ( positiveCount > negativeCount ) return "1";
+        else return "0";
+    }
+
+    private static List<CSVAttribute[]> partitionExamples(Collection<CSVAttribute[]> examples, int attributeIndex,
+                                                                String value) {
+        List<CSVAttribute[]> newExamples = new ArrayList<>(examples);
+        newExamples.removeIf(e -> !e[attributeIndex].getValue().equals(value));
+        for (CSVAttribute[] row : newExamples) {
+            // remove attribute from row array
+            System.arraycopy(row, attributeIndex + 1, row, attributeIndex, row.length - 1 - attributeIndex);
+        }
+        return newExamples;
     }
 
     /**

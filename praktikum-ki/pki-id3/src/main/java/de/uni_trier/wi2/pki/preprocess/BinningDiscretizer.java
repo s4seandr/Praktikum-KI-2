@@ -53,7 +53,7 @@ public class BinningDiscretizer {
 
             for( int i = 1; i <= numberOfBins; i++) {
                 if (minValue + (binWidth * i) >= (double) value.getValue()) {
-                    value.setValue((double) i);
+                    row[attributeId] = new CategoricalCSVAttribute(Integer.toString(i));
                     break;
                 }
             }

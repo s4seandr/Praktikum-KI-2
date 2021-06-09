@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Is used to read in CSV files.
@@ -42,7 +43,8 @@ public class CSVReader {
         return data;
     }
 
-    public static List<CSVAttribute[]> buildList(List<String[]> list, int labelIndex) {
+    public static List<CSVAttribute[]> buildList(List<String[]> list, int labelIndex,
+                                                 Set<Integer> categoricalAttributeIndices) {
 
         List<CSVAttribute[]> csvList = new ArrayList<>();
 
@@ -56,7 +58,11 @@ public class CSVReader {
                     newRow[index] = new CategoricalCSVAttribute(value);
                 } else {
                     try {
-                        newRow[index] = new ContinuousCSVAttribute(Double.parseDouble(value));
+                        if (categoricalAttributeIndices.contains(index)) {
+                            newRow[index] = new CategoricalCSVAttribute(value);
+                        } else {
+                            newRow[index] = new ContinuousCSVAttribute(Double.parseDouble(value));
+                        }
                     } catch (NumberFormatException e) {
                         newRow[index] = new CategoricalCSVAttribute(value);
                     }

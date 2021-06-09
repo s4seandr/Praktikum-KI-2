@@ -1,5 +1,6 @@
 package de.uni_trier.wi2.pki.tree;
 
+import java.rmi.dgc.Lease;
 import java.util.HashMap;
 
 /**
@@ -20,24 +21,40 @@ public class DecisionTreeNode {
     /**
      * The attribute label.
      */
-    protected boolean label;
+    protected String label;
 
 
     /**
      * The checked split condition values and the nodes for these conditions.
      */
-    HashMap<String, DecisionTreeNode> splits;
+    HashMap<String, DecisionTreeNode> splits = new HashMap<>();
 
     public void setParent(DecisionTreeNode parent) {
         this.parent = parent;
+    }
+
+    public DecisionTreeNode() {
+    }
+
+    public DecisionTreeNode(DecisionTreeNode parent, int attributeIndex) {
+        this.parent = parent;
+        this.attributeIndex = attributeIndex;
     }
 
     public void setAttributeIndex(int attributeIndex) {
         this.attributeIndex = attributeIndex;
     }
 
-    public void  setLabel( boolean bool ){
+    public void  setLabel( String bool ){
         this.label = bool;
+    }
+
+    public HashMap<String, DecisionTreeNode> getSplits() {
+        return splits;
+    }
+
+    public boolean isLeaf() {
+        return splits.isEmpty();
     }
 
     /**
@@ -50,4 +67,8 @@ public class DecisionTreeNode {
         this.splits.put(conditionValue, branch);
     }
 
+    @Override
+    public String toString() {
+        return "DecisionTreeNode{attributeIndex=" + attributeIndex + '}';
+    }
 }

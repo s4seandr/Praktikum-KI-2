@@ -102,7 +102,7 @@ public class EntropyUtils {
      * @param attributeIndex    The index of the attribute to calculate p and n values
      * @return Map of values and occurences
      */
-    public static  HashMap<CSVAttribute, Integer> getAttributeValueDomain(Collection<CSVAttribute[]> examples,
+    public static HashMap<CSVAttribute, Integer> getAttributeValueDomain(Collection<CSVAttribute[]> examples,
                                                                           int attributeIndex) {
 
         HashSet<CSVAttribute> valueDomain = new HashSet<>();
