@@ -22,4 +22,22 @@ public class DecisionTreeNode {
      */
     HashMap<String, DecisionTreeNode> splits;
 
+
+    public void setParent(DecisionTreeNode parent) {
+        this.parent = parent;
+    }
+
+    public void setAttributeIndex(int attributeIndex) {
+        this.attributeIndex = attributeIndex;
+    }
+
+    /**
+     * Adds a leaf to the node
+     *
+     * @param conditionValue
+     * @param branch
+     */
+    public void addSplit(String conditionValue, DecisionTreeNode branch) {
+        this.splits.put(conditionValue, branch);
+    }
 }

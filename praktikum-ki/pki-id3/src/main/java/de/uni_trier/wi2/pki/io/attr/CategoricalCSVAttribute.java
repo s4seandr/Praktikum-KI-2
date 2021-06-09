@@ -1,7 +1,6 @@
 package de.uni_trier.wi2.pki.io.attr;
 
 import java.util.Objects;
-import java.util.StringTokenizer;
 
 public class CategoricalCSVAttribute implements CSVAttribute {
     public String value;

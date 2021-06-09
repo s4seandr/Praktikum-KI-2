@@ -14,6 +14,8 @@ public class Main {
         List<String[]> input = CSVReader.readCsvToArray("pki-id3/src/main/resources/churn_data.csv", ";", true);
         List<CSVAttribute[]> csvList = CSVReader.buildList(input, 10);
         BinningDiscretizer bd = new BinningDiscretizer();
+
+        // Discretize all attributes where needed
         csvList = bd.discretize(5, csvList, 3); // Age
         csvList = bd.discretize(5, csvList, 5); // Balance
         csvList = bd.discretize(5, csvList, 0); // CreditScore
