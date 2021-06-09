@@ -48,36 +48,47 @@ public class ID3Utils {
         DecisionTreeNode node = new DecisionTreeNode();
 
         // TODO: recursion anchor
+            // all positive
+            if (!hasNegatives(examples, labelIndex)) {
+                node.setLabel(false);
+                return node;
+                // TODO: set label to -
+            }
 
-        // all positive
-        if (!hasNegatives(examples, labelIndex)) {
-            return node;
-            // TODO: set label to -
-        }
+            // all negative
+            if (!hasPositives(examples, labelIndex)) {
+                node.setLabel(true);
+                return node;
+                // TODO:  set label to +
+            }
 
-        // all negative
-        if (!hasPositives(examples, labelIndex)) {
-            return node;
-            // TODO:  set label to +
-        }
+            if (examples.isEmpty()) {
+                boolean foundPositiveLabel;
+                int positiveLabel = 0;
+                int negativeLabel = 0;
+                for(CSVAttribute[] row : examples) {
+                    foundPositiveLabel = row[labelIndex].equals(new CategoricalCSVAttribute("1"));
+                    if (foundPositiveLabel) positiveLabel++;
+                    else negativeLabel++;
+                }
+                if( positiveLabel > negativeLabel ){
+                    node.setLabel(true);
+                }else{ node.setLabel(false); }
+                return node;
+                // TODO: set label to most common value of labelAttribute
+            }
 
-        if (examples.isEmpty()) {
-            return node;
-            // TODO: set label to most common value of labelAttribute
-        }
+            int maxInfoGainAttr = getMostEfficientAttribute(examples, labelIndex);
+            node.setAttributeIndex(maxInfoGainAttr);
+            HashMap<CSVAttribute, Integer> valueDomain = EntropyUtils.getAttributeValueDomain(examples, maxInfoGainAttr);
 
-        int maxInfoGainAttr = getMostEfficientAttribute(examples, labelIndex);
-        node.setAttributeIndex(maxInfoGainAttr);
-        HashMap<CSVAttribute, Integer> valueDomain = EntropyUtils.getAttributeValueDomain(examples, maxInfoGainAttr);
+            for (CSVAttribute value : valueDomain.keySet()) {
 
-        for(CSVAttribute value : valueDomain.keySet()) {
-
-            DecisionTreeNode child = createTree(null, 0); // TODO: create tree with correct partition
-            child.setParent(node);
-            node.addSplit(value.toString(), child);
-        }
-
-        return null;
+                DecisionTreeNode child = createTree(examples, labelIndex); // TODO: create tree with correct partition
+                child.setParent(node);
+                node.addSplit(value.toString(), child);
+            }
+        return node;
     }
 
     /**

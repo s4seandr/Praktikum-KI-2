@@ -18,10 +18,15 @@ public class DecisionTreeNode {
     protected int attributeIndex;
 
     /**
+     * The attribute label.
+     */
+    protected boolean label;
+
+
+    /**
      * The checked split condition values and the nodes for these conditions.
      */
     HashMap<String, DecisionTreeNode> splits;
-
 
     public void setParent(DecisionTreeNode parent) {
         this.parent = parent;
@@ -29,6 +34,10 @@ public class DecisionTreeNode {
 
     public void setAttributeIndex(int attributeIndex) {
         this.attributeIndex = attributeIndex;
+    }
+
+    public void  setLabel( boolean bool ){
+        this.label = bool;
     }
 
     /**
@@ -40,4 +49,5 @@ public class DecisionTreeNode {
     public void addSplit(String conditionValue, DecisionTreeNode branch) {
         this.splits.put(conditionValue, branch);
     }
+
 }

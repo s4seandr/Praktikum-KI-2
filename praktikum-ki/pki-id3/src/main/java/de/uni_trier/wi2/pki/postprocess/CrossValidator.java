@@ -5,7 +5,6 @@ import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
 import java.util.List;
 import java.util.function.BiFunction;
-//import java.util.function.BiFunction;
 
 /**
  * Contains util methods for performing a cross-validation.

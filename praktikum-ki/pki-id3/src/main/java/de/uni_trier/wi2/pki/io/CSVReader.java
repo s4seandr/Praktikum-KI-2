@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -30,7 +29,7 @@ public class CSVReader {
     public static List<String[]> readCsvToArray(String relativePath, String delimiter, boolean ignoreHeader) throws IOException {
 
         BufferedReader br = new BufferedReader(new FileReader(relativePath));
-        List<String[]> array = new ArrayList<>();
+        List<String[]> data = new ArrayList<>();
 
         String line;
 
@@ -38,9 +37,9 @@ public class CSVReader {
         if (ignoreHeader) br.readLine();
         while ((line = br.readLine()) != null) {
             String[] values = line.split(delimiter);
-            array.add(values);
+            data.add(values);
         }
-        return array;
+        return data;
     }
 
     public static List<CSVAttribute[]> buildList(List<String[]> list, int labelIndex) {
@@ -69,5 +68,4 @@ public class CSVReader {
 
         return csvList;
     }
-
 }
