@@ -5,10 +5,7 @@ import de.uni_trier.wi2.pki.io.attr.CategoricalCSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeLeaf;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Utility class for creating a decision tree with the ID3 algorithm.
@@ -24,28 +21,30 @@ public class ID3Utils {
      */
     public static DecisionTreeNode createTree(Collection<CSVAttribute[]> examples, DecisionTreeNode parent, String[] attributeNames, int labelIndex) {
 
+
         // Create a root node for the tree
-        DecisionTreeNode node = new DecisionTreeNode(attributeNames);
+        String label = getMostCommonLabel(examples, labelIndex);
+        DecisionTreeNode node = new DecisionTreeNode(attributeNames, label);
         node.setParent(parent);
 
         // If all examples are positive, Return the single-node tree Root, with label = +.
         if (!hasNegatives(examples, labelIndex)) {
-            DecisionTreeNode leaf = new DecisionTreeLeaf("1");
+            DecisionTreeLeaf leaf = new DecisionTreeLeaf("1");
             leaf.setParent(node);
             return leaf;
         }
 
         // If all examples are negative, Return the single-node tree Root, with label = -.
         if (!hasPositives(examples, labelIndex)) {
-            DecisionTreeNode leaf = new DecisionTreeLeaf("0");
+            DecisionTreeLeaf leaf = new DecisionTreeLeaf("0");
             leaf.setParent(node);
             return leaf;
         }
 
         // If number of predicting attributes is empty, then Return the single node tree Root,
         // with label = most common value of the target attribute in the examples.
-        if (((List<CSVAttribute[]>) examples).get(0).length == 1) {
-            DecisionTreeNode leaf = new DecisionTreeLeaf(getMostCommonLabel(examples, labelIndex));
+        if (attributeNames.length == 1) {
+            DecisionTreeLeaf leaf = new DecisionTreeLeaf(getMostCommonLabel(examples, labelIndex));
             leaf.setParent(node);
             return leaf;
         }
@@ -59,8 +58,7 @@ public class ID3Utils {
         if (maxInfoGainAttr < labelIndex) labelIndex--;
 
         // For each possible value, vi, of A,
-        HashMap<CSVAttribute, Integer> valueDomain = EntropyUtils.getAttributeValueDomain(examples,
-                maxInfoGainAttr);
+        HashMap<CSVAttribute, Integer> valueDomain = EntropyUtils.getAttributeValueDomain(examples, maxInfoGainAttr);
 
         for (CSVAttribute value : valueDomain.keySet()) {
 

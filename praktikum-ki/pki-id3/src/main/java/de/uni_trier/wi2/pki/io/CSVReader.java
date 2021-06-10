@@ -97,4 +97,15 @@ public class CSVReader {
 
         return csvList;
     }
+
+    public static void printTable(List<CSVAttribute[]> table, int maxRows) {
+        for (int j = 0; j < maxRows; j++) {
+            for (int i = 0; i < 11; i++) {
+                System.out.print(table.get(j)[i] + ", ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
 }

@@ -7,13 +7,10 @@ import org.jdom.Element;
  *
  */
 public class DecisionTreeLeaf extends DecisionTreeNode {
-    /**
-     * The attribute label.
-     */
-    protected String label;
+
 
     public DecisionTreeLeaf(String label) {
-        this.label = label;
+        super(label);
     }
 
     /**

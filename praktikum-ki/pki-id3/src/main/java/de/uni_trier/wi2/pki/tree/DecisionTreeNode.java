@@ -11,6 +11,15 @@ import java.util.HashMap;
  */
 public class DecisionTreeNode {
 
+    /**
+     * The attribute label.
+     */
+    protected String label;
+
+    public String getLabel() {
+        return label;
+    }
+
     protected String[] attributeNames;
     /**
      * The parent node in the decision tree.
@@ -29,9 +38,16 @@ public class DecisionTreeNode {
     public DecisionTreeNode() {
     }
 
-    public DecisionTreeNode(String[] attributeNames) {
+    public DecisionTreeNode(String[] attributeNames, String label) {
         this.attributeNames = attributeNames;
+        this.label = label;
     }
+
+    public DecisionTreeNode(String label) {
+        this.label = label;
+    }
+
+
 
     public void setParent(DecisionTreeNode parent) {
         this.parent = parent;
@@ -55,6 +71,22 @@ public class DecisionTreeNode {
                 '}';
     }
 
+    public DecisionTreeNode getSplit(String value) {
+        return splits.get(value);
+    }
+
+    public boolean isLeaf() {
+        return splits.isEmpty();
+    }
+
+    public int getAttributeIndex() {
+        return attributeIndex;
+    }
+
+    public HashMap<String, DecisionTreeNode> getSplits() {
+        return splits;
+    }
+
     /**
      * returns an XML Element for the tree and its subtrees
      *
@@ -63,6 +95,7 @@ public class DecisionTreeNode {
     public Element getXMLElement() {
         Element xmlElement = new Element("Node");
         xmlElement.setAttribute("attribute", attributeNames[attributeIndex]);
+        xmlElement.setAttribute("label", label);
 
         Collection<Element> ifElements = new ArrayList<>();
         for (String value : splits.keySet()) {
