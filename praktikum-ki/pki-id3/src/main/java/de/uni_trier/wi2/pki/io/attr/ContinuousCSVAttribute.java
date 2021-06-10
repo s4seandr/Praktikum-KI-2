@@ -3,10 +3,6 @@ package de.uni_trier.wi2.pki.io.attr;
 
 import java.util.Objects;
 
-/**
- * TODO: Generalize
- */
-
 public class ContinuousCSVAttribute implements CSVAttribute{
 
     public double value;
@@ -54,9 +50,7 @@ public class ContinuousCSVAttribute implements CSVAttribute{
     @Override
     public boolean equals( Object that){
         if (that instanceof ContinuousCSVAttribute) {
-            if(this.value == (double) ((ContinuousCSVAttribute) that).getValue() ){
-                return true;
-            }
+            return this.value == (double) ((ContinuousCSVAttribute) that).getValue();
         }
         return false;
     }

@@ -1,6 +1,7 @@
 package de.uni_trier.wi2.pki;
 
 import de.uni_trier.wi2.pki.io.CSVReader;
+import de.uni_trier.wi2.pki.io.XMLWriter;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.preprocess.BinningDiscretizer;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
@@ -13,7 +14,9 @@ import java.util.*;
 public class Main {
 
     public static void main(String[] args) throws IOException{
+
         List<String[]> input = CSVReader.readCsvToArray("pki-id3/src/main/resources/churn_data.csv", ";", true);
+        String[] attrNames =  CSVReader.readAttributeNames("pki-id3/src/main/resources/churn_data.csv", ";");
 
 
         // Override attribute type
@@ -26,13 +29,12 @@ public class Main {
         BinningDiscretizer bd = new BinningDiscretizer();
 
         // Discretize all attributes where needed
-        csvList = bd.discretize(5, csvList, 3); // Age
+        csvList = bd.discretize(6, csvList, 3); // Age
         csvList = bd.discretize(5, csvList, 5); // Balance
-        csvList = bd.discretize(5, csvList, 0); // CreditScore
+        csvList = bd.discretize(7, csvList, 0); // CreditScore
         csvList = bd.discretize(5, csvList, 9); // EstimatedSalary
-        csvList = bd.discretize(5, csvList, 6); // NumOfProducts
+        csvList = bd.discretize(4, csvList, 6); // NumOfProducts
         csvList = bd.discretize(5, csvList, 4); // Tenure
-
 
         // print out first 10 examples to check
         for (int j = 0; j < 10; j++) {
@@ -42,22 +44,11 @@ public class Main {
             System.out.println();
         }
 
+
+        DecisionTreeNode tree = ID3Utils.createTree(csvList, null, attrNames, 10);
         System.out.println(EntropyUtils.calcInformationGain(csvList, 10));
 
-        DecisionTreeNode tree = ID3Utils.createTree(csvList, 10);
-
-        System.out.println(tree);
-
-
-
-        HashMap<String, DecisionTreeNode> splits = tree.getSplits();
-        for(String child : splits.keySet()) {
-            System.out.println(child);
-            System.out.println(splits.get(child));
-        }
-
-//
-
+        XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\tree.xml", tree);
 
     }
 

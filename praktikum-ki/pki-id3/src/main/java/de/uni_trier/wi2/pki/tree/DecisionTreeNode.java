@@ -1,6 +1,9 @@
 package de.uni_trier.wi2.pki.tree;
 
-import java.rmi.dgc.Lease;
+import org.jdom.Element;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -8,60 +11,38 @@ import java.util.HashMap;
  */
 public class DecisionTreeNode {
 
+    protected String[] attributeNames;
     /**
      * The parent node in the decision tree.
      */
     protected DecisionTreeNode parent;
-
     /**
      * The attribute index to check.
      */
     protected int attributeIndex;
 
     /**
-     * The attribute label.
-     */
-    protected String label;
-
-
-    /**
      * The checked split condition values and the nodes for these conditions.
      */
     HashMap<String, DecisionTreeNode> splits = new HashMap<>();
+
+    public DecisionTreeNode() {
+    }
+
+    public DecisionTreeNode(String[] attributeNames) {
+        this.attributeNames = attributeNames;
+    }
 
     public void setParent(DecisionTreeNode parent) {
         this.parent = parent;
     }
 
-    public DecisionTreeNode() {
-    }
-
-    public DecisionTreeNode(DecisionTreeNode parent, int attributeIndex) {
-        this.parent = parent;
-        this.attributeIndex = attributeIndex;
-    }
-
-    public void setAttributeIndex(int attributeIndex) {
-        this.attributeIndex = attributeIndex;
-    }
-
-    public void  setLabel( String bool ){
-        this.label = bool;
-    }
-
-    public HashMap<String, DecisionTreeNode> getSplits() {
-        return splits;
-    }
-
-    public boolean isLeaf() {
-        return splits.isEmpty();
-    }
 
     /**
-     * Adds a leaf to the node
+     * Adds a split to the node
      *
-     * @param conditionValue
-     * @param branch
+     * @param conditionValue    the value for the added branch
+     * @param branch            a tree node
      */
     public void addSplit(String conditionValue, DecisionTreeNode branch) {
         this.splits.put(conditionValue, branch);
@@ -69,6 +50,36 @@ public class DecisionTreeNode {
 
     @Override
     public String toString() {
-        return "DecisionTreeNode{attributeIndex=" + attributeIndex + '}';
+        return "DecisionTreeNode{" +
+                "attributeIndex=" + attributeIndex +
+                '}';
     }
+
+    /**
+     * returns an XML Element for the tree and its subtrees
+     *
+     * @return XML Element
+     */
+    public Element getXMLElement() {
+        Element xmlElement = new Element("Node");
+        xmlElement.setAttribute("attribute", attributeNames[attributeIndex]);
+
+        Collection<Element> ifElements = new ArrayList<>();
+        for (String value : splits.keySet()) {
+            Element ifElement = new Element("IF");
+            ifElement.setAttribute("value", value);
+
+            ifElement.addContent(splits.get(value).getXMLElement());
+
+            ifElements.add(ifElement);
+        }
+
+        xmlElement.addContent(ifElements);
+        return xmlElement;
+    }
+
+    public void setAttributeIndex(int attributeIndex) {
+        this.attributeIndex = attributeIndex;
+    }
+
 }
