@@ -16,9 +16,6 @@ public class DecisionTreeNode {
      */
     protected String label;
 
-    public String getLabel() {
-        return label;
-    }
 
     protected String[] attributeNames;
     /**
@@ -35,7 +32,8 @@ public class DecisionTreeNode {
      */
     HashMap<String, DecisionTreeNode> splits = new HashMap<>();
 
-    public DecisionTreeNode() {
+    public void setSplits(HashMap<String, DecisionTreeNode> splits) {
+        this.splits = splits;
     }
 
     public DecisionTreeNode(String[] attributeNames, String label) {
@@ -47,11 +45,6 @@ public class DecisionTreeNode {
         this.label = label;
     }
 
-
-
-    public void setParent(DecisionTreeNode parent) {
-        this.parent = parent;
-    }
 
 
     /**
@@ -71,12 +64,8 @@ public class DecisionTreeNode {
                 '}';
     }
 
-    public DecisionTreeNode getSplit(String value) {
-        return splits.get(value);
-    }
-
-    public boolean isLeaf() {
-        return splits.isEmpty();
+    public String getLabel() {
+        return label;
     }
 
     public int getAttributeIndex() {
@@ -86,6 +75,16 @@ public class DecisionTreeNode {
     public HashMap<String, DecisionTreeNode> getSplits() {
         return splits;
     }
+
+    public void setParent(DecisionTreeNode parent) { this.parent = parent; }
+
+    public void setAttributeIndex(int attributeIndex) {
+        this.attributeIndex = attributeIndex;
+    }
+
+    public boolean isLeaf() { return splits.isEmpty(); }
+
+    public void removeSplits() { splits = new HashMap<>(); }
 
     /**
      * returns an XML Element for the tree and its subtrees
@@ -111,8 +110,5 @@ public class DecisionTreeNode {
         return xmlElement;
     }
 
-    public void setAttributeIndex(int attributeIndex) {
-        this.attributeIndex = attributeIndex;
-    }
 
 }

@@ -4,6 +4,7 @@ import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.XMLWriter;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.postprocess.CrossValidator;
+import de.uni_trier.wi2.pki.postprocess.ReducedErrorPruner;
 import de.uni_trier.wi2.pki.preprocess.BinningDiscretizer;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import de.uni_trier.wi2.pki.util.EntropyUtils;
@@ -12,7 +13,6 @@ import de.uni_trier.wi2.pki.util.TreeModel;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.BiFunction;
 
 public class Main {
 
@@ -39,13 +39,6 @@ public class Main {
         csvList = bd.discretize(4, csvList, 6); // NumOfProducts
         csvList = bd.discretize(5, csvList, 4); // Tenure
 
-        /*// print out first 10 examples to check
-        for (int j = 0; j < 50; j++) {
-            for (int i = 0; i < 11; i++) {
-                System.out.print(csvList.get(j)[i] + ", ");
-            }
-            System.out.println();
-        }*/
 
         DecisionTreeNode tree = ID3Utils.createTree(csvList, null, attrNames, 10);
 
@@ -54,24 +47,16 @@ public class Main {
 
         TreeModel tm = new TreeModel(attrNames);
 
-/*        CSVAttribute[] ul = new CSVAttribute[csvList.get(0).length];
-        System.arraycopy(csvList.get(0), 0, ul, 0, ul.length);
-        ul[10].setValue("null");
-        List<CSVAttribute[]> ulList = new ArrayList<>();
-        ulList.add(ul);
-        for (int j = 0; j < 1; j++) {
-            for (int i = 0; i < 11; i++) {
-                System.out.print(ulList.get(j)[i] + ", ");
-            }
-            System.out.println();
-        }
-        List<CSVAttribute[]> lList = TreeModel.predict(ulList, tree, 10);
-        System.out.println(ulList.get(0));
-        System.out.println(lList.get(0));
-*/
-        DecisionTreeNode testTree = CrossValidator.performCrossValidation(csvList, 10, tm, 5);
+        ReducedErrorPruner ep = new ReducedErrorPruner();
 
-        XMLWriter.writeXML("C:\\Users\\Andres\\Desktop\\tree.xml", testTree);
+        System.out.println(ID3Utils.getNodeList(tree, new ArrayList<>()).size());
+        DecisionTreeNode treeNormal =  CrossValidator.performCrossValidation(csvList, 10, tm, 5);
+        ep.prune(tree, csvList, attrNames, 10);
+        System.out.println(ID3Utils.getNodeList(tree, new ArrayList<>()).size());
+        DecisionTreeNode treePruned = CrossValidator.performCrossValidation(csvList, 10, tm, 5);
+
+        XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\treePruned.xml", treePruned);
+        XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\treeNormal.xml", treeNormal);
 
     }
 

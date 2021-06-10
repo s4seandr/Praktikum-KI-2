@@ -209,4 +209,18 @@ public class ID3Utils {
         return maxGainIndex;
     }
 
+    public static List<DecisionTreeNode> getNodeList(DecisionTreeNode tree, List<DecisionTreeNode> nodeList) {
+        DecisionTreeNode currentNode = tree;
+
+        HashMap<String, DecisionTreeNode> splits = currentNode.getSplits();
+
+        for (String split : splits.keySet()) {
+            getNodeList(splits.get(split), nodeList);
+        }
+        if (!currentNode.isLeaf()) {
+            nodeList.add((DecisionTreeNode) currentNode);
+        }
+        return nodeList;
+    }
+
 }

@@ -29,9 +29,6 @@ public class CrossValidator {
 
         // Split dataset
         DecisionTreeNode learnedTree = null;
-        List<CSVAttribute[]> labledTestData;
-
-        int correct;
 
         for (int i = 0; i < numFolds; i++) {
             List<List<CSVAttribute[]>> splitData = getTrainData(dataset, numFolds, labelAttribute);
@@ -43,14 +40,7 @@ public class CrossValidator {
             // learn from training subset
             learnedTree = trainFunction.apply(trainData, labelAttribute);
 
-            labledTestData = TreeModel.predict(ulTestData, learnedTree, labelAttribute);
-
-            correct = 0;
-            for (int j = 0; j < labledTestData.size(); j++) {
-                if (labledTestData.get(j)[labelAttribute].equals(lTestData.get(j)[labelAttribute])) correct++;
-            }
-
-            foldPerfResults.add((double) correct / (double) labledTestData.size());
+            foldPerfResults.add(predictionAccuracy(ulTestData, lTestData, learnedTree, labelAttribute));
         }
 
         double averageAccuracy = foldPerfResults.stream().mapToDouble(d -> d).average().orElse(0.0);
@@ -62,29 +52,33 @@ public class CrossValidator {
         return learnedTree;
     }
 
-    public static double predictionAccuracy(List<CSVAttribute[]> dataset, DecisionTreeNode tree, int labelAttribute, float trainingRatio){
-        List<List<CSVAttribute[]>> splitData = getTrainData(dataset, trainingRatio, labelAttribute);
+    /**
+     * Returns the accuracy of the tree when applied to the ulTestData.
+     *
+     * @param ulTestData        Set of unlabeled examples
+     * @param validationData    Set of labeled examples
+     * @param tree              The decision tree to be evaluated
+     * @param labelAttribute    The label attribute index.
+     * @return                  The predictions accuracy as double.
+     */
+    public static double predictionAccuracy(List<CSVAttribute[]> ulTestData, List<CSVAttribute[]> validationData,
+                                            DecisionTreeNode tree, int labelAttribute){
 
-        List<CSVAttribute[]> trainData = splitData.get(0);
-        List<CSVAttribute[]> ulTestData = splitData.get(1);
-        List<CSVAttribute[]> lTestData = splitData.get(2);
+        List<CSVAttribute[]> predictedTestData = TreeModel.predict(ulTestData, tree, labelAttribute);
 
-        // learn from training subset
-        learnedTree = trainFunction.apply(trainData, labelAttribute);
-
-        labledTestData = TreeModel.predict(ulTestData, learnedTree, labelAttribute);
-
-        correct = 0;
-        for (int j = 0; j < labledTestData.size(); j++) {
-            if (labledTestData.get(j)[labelAttribute].equals(lTestData.get(j)[labelAttribute])) correct++;
+        int correct = 0;
+        for (int j = 0; j < predictedTestData.size(); j++) {
+            if (predictedTestData.get(j)[labelAttribute].equals(validationData.get(j)[labelAttribute])) correct++;
         }
+
+        return (double) correct / (double) predictedTestData.size();
     }
 
     /**
      * Returns a List of subsets of the dataset, split according to the number of folds
      *
      * @param dataset           The dataset to split.
-     * @param numFolds          The number of folds.
+     * @param numFolds    The number of folds.
      * @param labelAttribute    The label attribute index.
      * @return                  A List of Subsets, the training data, the unlabled test data and the labled test data
      *                          to validate the results later.
