@@ -11,7 +11,7 @@ public interface CSVAttribute<T> extends Comparable<CSVAttribute<T>>, Cloneable 
      *
      * @param value the value
      */
-     void setValue(T value);
+    void setValue(T value);
 
     /**
      * Get the value for this attribute.

@@ -62,6 +62,24 @@ public class CrossValidator {
         return learnedTree;
     }
 
+    public static double predictionAccuracy(List<CSVAttribute[]> dataset, DecisionTreeNode tree, int labelAttribute, float trainingRatio){
+        List<List<CSVAttribute[]>> splitData = getTrainData(dataset, trainingRatio, labelAttribute);
+
+        List<CSVAttribute[]> trainData = splitData.get(0);
+        List<CSVAttribute[]> ulTestData = splitData.get(1);
+        List<CSVAttribute[]> lTestData = splitData.get(2);
+
+        // learn from training subset
+        learnedTree = trainFunction.apply(trainData, labelAttribute);
+
+        labledTestData = TreeModel.predict(ulTestData, learnedTree, labelAttribute);
+
+        correct = 0;
+        for (int j = 0; j < labledTestData.size(); j++) {
+            if (labledTestData.get(j)[labelAttribute].equals(lTestData.get(j)[labelAttribute])) correct++;
+        }
+    }
+
     /**
      * Returns a List of subsets of the dataset, split according to the number of folds
      *

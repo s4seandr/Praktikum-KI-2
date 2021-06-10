@@ -57,26 +57,21 @@ public class Main {
 /*        CSVAttribute[] ul = new CSVAttribute[csvList.get(0).length];
         System.arraycopy(csvList.get(0), 0, ul, 0, ul.length);
         ul[10].setValue("null");
-
-
         List<CSVAttribute[]> ulList = new ArrayList<>();
         ulList.add(ul);
-
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < 11; i++) {
                 System.out.print(ulList.get(j)[i] + ", ");
             }
             System.out.println();
         }
-
         List<CSVAttribute[]> lList = TreeModel.predict(ulList, tree, 10);
-
         System.out.println(ulList.get(0));
         System.out.println(lList.get(0));
 */
         DecisionTreeNode testTree = CrossValidator.performCrossValidation(csvList, 10, tm, 5);
 
-        XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\tree.xml", testTree);
+        XMLWriter.writeXML("C:\\Users\\Andres\\Desktop\\tree.xml", testTree);
 
     }
 

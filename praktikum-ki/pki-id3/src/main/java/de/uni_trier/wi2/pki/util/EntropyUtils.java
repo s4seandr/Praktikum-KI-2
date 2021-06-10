@@ -103,7 +103,7 @@ public class EntropyUtils {
      * @return Map of values and occurences
      */
     public static HashMap<CSVAttribute, Integer> getAttributeValueDomain(Collection<CSVAttribute[]> examples,
-                                                                          int attributeIndex) {
+                                                                         int attributeIndex) {
 
         HashSet<CSVAttribute> valueDomain = new HashSet<>();
         HashMap<CSVAttribute, Integer> valueDomainCountMap = new HashMap<>();
