@@ -26,12 +26,6 @@ public class TreeModel implements BiFunction {
 
     public static List<CSVAttribute[]> predict(List<CSVAttribute[]> ulTestData, DecisionTreeNode tree, int labelAttribute) {
 
-        try {
-            XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\treeTest.xml", tree);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         for (CSVAttribute[] row : ulTestData) {
             DecisionTreeNode currentNode = tree;
 

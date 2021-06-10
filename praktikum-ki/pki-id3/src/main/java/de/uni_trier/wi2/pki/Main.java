@@ -74,9 +74,9 @@ public class Main {
         System.out.println(ulList.get(0));
         System.out.println(lList.get(0));
 */
-        CrossValidator.performCrossValidation(csvList, 10, tm, 5);
+        DecisionTreeNode testTree = CrossValidator.performCrossValidation(csvList, 10, tm, 5);
 
-        XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\tree.xml", tree);
+        XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\tree.xml", testTree);
 
     }
 
