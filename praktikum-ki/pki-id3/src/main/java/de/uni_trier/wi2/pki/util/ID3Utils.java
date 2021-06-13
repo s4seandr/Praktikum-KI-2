@@ -19,7 +19,8 @@ public class ID3Utils {
      * @param labelIndex The label of the attribute that should be used as an index.
      * @return The root node of the decision tree
      */
-    public static DecisionTreeNode createTree(Collection<CSVAttribute[]> examples, DecisionTreeNode parent, String[] attributeNames, int labelIndex) {
+    public static DecisionTreeNode createTree(Collection<CSVAttribute[]> examples, DecisionTreeNode parent,
+                                              String[] attributeNames, int labelIndex) {
 
 
         // Create a root node for the tree

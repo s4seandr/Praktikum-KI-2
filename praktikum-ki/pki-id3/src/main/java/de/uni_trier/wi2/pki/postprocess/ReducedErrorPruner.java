@@ -21,7 +21,7 @@ public class ReducedErrorPruner {
      * @param validationExamples  the examples to validate the pruning with.
      * @param labelAttributeId    The label attribute.
      */
-    public void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, String[] attrNames, int labelAttributeId) {
+    public void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
         List<CSVAttribute[]> trainData = new ArrayList<>();
         List<CSVAttribute[]> validationData = new ArrayList<>();
         List<CSVAttribute[]> ulValidationData = new ArrayList<>();

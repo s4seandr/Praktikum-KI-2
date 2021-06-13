@@ -94,7 +94,7 @@ public class DecisionTreeNode {
     public Element getXMLElement() {
         Element xmlElement = new Element("Node");
         xmlElement.setAttribute("attribute", attributeNames[attributeIndex]);
-        xmlElement.setAttribute("label", label);
+//        xmlElement.setAttribute("label", label);
 
         Collection<Element> ifElements = new ArrayList<>();
         for (String value : splits.keySet()) {

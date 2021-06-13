@@ -1,6 +1,5 @@
 package de.uni_trier.wi2.pki.postprocess;
 
-import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import de.uni_trier.wi2.pki.util.TreeModel;
@@ -30,18 +29,40 @@ public class CrossValidator {
         // Split dataset
         DecisionTreeNode learnedTree = null;
 
+        List<CSVAttribute[]> trainData = null;
+        List<CSVAttribute[]> ulTestData = null;
+        List<CSVAttribute[]> lTestData = null;
+
+        int[][] confusionMatrix = new int[][]{{0,0},{0,0}};
+
         for (int i = 0; i < numFolds; i++) {
             List<List<CSVAttribute[]>> splitData = getTrainData(dataset, numFolds, labelAttribute);
 
-            List<CSVAttribute[]> trainData = splitData.get(0);
-            List<CSVAttribute[]> ulTestData = splitData.get(1);
-            List<CSVAttribute[]> lTestData = splitData.get(2);
+            trainData = splitData.get(0);
+            ulTestData = splitData.get(1);
+            lTestData = splitData.get(2);
 
             // learn from training subset
             learnedTree = trainFunction.apply(trainData, labelAttribute);
 
             foldPerfResults.add(predictionAccuracy(ulTestData, lTestData, learnedTree, labelAttribute));
+
+            int[][] newConfusionMatrix = getConfusionMatrix(ulTestData, lTestData, labelAttribute);
+            confusionMatrix[0][0] += newConfusionMatrix[0][0];
+            confusionMatrix[0][1] += newConfusionMatrix[0][1];
+            confusionMatrix[1][0] += newConfusionMatrix[1][0];
+            confusionMatrix[1][1] += newConfusionMatrix[1][1];
         }
+
+
+        int tp = confusionMatrix[0][0];
+        int fp = confusionMatrix[0][1];
+        int fn = confusionMatrix[1][0];
+        int tn = confusionMatrix[1][1];
+        float posPrecision = (float) tp / (tp + fp);
+        float negPrecision = (float) tn / (tn + fn);
+        float posRecall = (float) tp / (tp + fn);
+        float negRecall = (float) tn / (tn + fp);
 
         double averageAccuracy = foldPerfResults.stream().mapToDouble(d -> d).average().orElse(0.0);
         double standardDeviation = Math.sqrt((foldPerfResults.stream()
@@ -49,8 +70,43 @@ public class CrossValidator {
                 .map(x -> Math.pow((x - averageAccuracy),2))
                 .sum()) / foldPerfResults.size());
         System.out.println("accuracy: " + averageAccuracy * 100 + "% +/- " + standardDeviation * 100 + "%");
+        System.out.println();
+        System.out.println("                  true 1   |    true 0  |   class precision");
+        System.out.println("-------------------------------------------");
+        System.out.println("pred. 1      |      "+tp+"    |     "+fp+"   |     "+posPrecision*100+"%");
+        System.out.println("pred. 0      |      "+fn+"    |     "+tn+"   |     "+negPrecision*100+"%");
+        System.out.println("-------------------------------------------");
+        System.out.println("class recall |   "+posRecall*100+"% |  "+negRecall*100+"% |        ");
+
         return learnedTree;
     }
+
+
+    /**
+     * Calculates the confusion matrix.
+     *
+     * @param predictedTestData Set of predicted examples
+     * @param validationData    Set of labeled examples
+     * @param labelAttribute    The label attribute index.
+     * @return Confusion Matrix as 2D array.
+     */
+    private static int[][] getConfusionMatrix(List<CSVAttribute[]> predictedTestData,
+                                              List<CSVAttribute[]> validationData, int labelAttribute) {
+
+        int[][] result = new int[][]{{0,0},{0,0}};
+
+        for (int j = 0; j < predictedTestData.size(); j++) {
+            CSVAttribute predictedLabel = predictedTestData.get(j)[labelAttribute];
+            CSVAttribute realLabel = validationData.get(j)[labelAttribute];
+            if (predictedLabel.equals(realLabel) && predictedLabel.getValue().equals("1")) result[0][0]++; // tp
+            if (!predictedLabel.equals(realLabel) && predictedLabel.getValue().equals("1")) result[0][1]++; // fp
+            if (!predictedLabel.equals(realLabel) && predictedLabel.getValue().equals("0")) result[1][0]++; // fn
+            if (predictedLabel.equals(realLabel) && predictedLabel.getValue().equals("0")) result[1][1]++; // tn
+        }
+
+        return result;
+    }
+
 
     /**
      * Returns the accuracy of the tree when applied to the ulTestData.
