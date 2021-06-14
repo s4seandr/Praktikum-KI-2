@@ -1,11 +1,8 @@
 package de.uni_trier.wi2.pki.postprocess;
 
-import de.uni_trier.wi2.pki.Main;
-import de.uni_trier.wi2.pki.io.CSVReader;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 import de.uni_trier.wi2.pki.util.ID3Utils;
-import de.uni_trier.wi2.pki.util.TreeModel;
 
 import java.util.*;
 
@@ -22,31 +19,25 @@ public class ReducedErrorPruner {
      * @param labelAttributeId    The label attribute.
      */
     public void prune(DecisionTreeNode trainedDecisionTree, Collection<CSVAttribute[]> validationExamples, int labelAttributeId) {
-        List<CSVAttribute[]> trainData = new ArrayList<>();
         List<CSVAttribute[]> validationData = new ArrayList<>();
         List<CSVAttribute[]> ulValidationData = new ArrayList<>();
 
         Random random = new Random();
         Collections.shuffle((List<CSVAttribute[]>) validationExamples, random);
 
-        // splits the validationExamples into training data and test data
-
-        for (int i = 0; i < validationExamples.size(); i++) {
-            if (i < validationExamples.size() * 0.8) trainData.add(((List<CSVAttribute[]>) validationExamples).get(i));
-            else {
-
-                // defensive copy
-                CSVAttribute[] row = ((List<CSVAttribute[]>) validationExamples).get(i);
-                CSVAttribute[] newRow = new CSVAttribute[row.length];
-                for (int k = 0; k < newRow.length; k++) {
-                    newRow[k] = (CSVAttribute) row[k].clone();
-                }
-                // remove labels
-                newRow[labelAttributeId].setValue("null");
-
-                validationData.add(((List<CSVAttribute[]>) validationExamples).get(i));
-                ulValidationData.add(newRow);
+        // generate a 20% subset of examples
+        for (int i = 0; i < validationExamples.size() * 0.2; i++) {
+            // defensive copy
+            CSVAttribute[] row = ((List<CSVAttribute[]>) validationExamples).get(i);
+            CSVAttribute[] newRow = new CSVAttribute[row.length];
+            for (int k = 0; k < newRow.length; k++) {
+                newRow[k] = (CSVAttribute) row[k].clone();
             }
+            // remove labels
+            newRow[labelAttributeId].setValue("null");
+
+            validationData.add(((List<CSVAttribute[]>) validationExamples).get(i));
+            ulValidationData.add(newRow);
         }
 
         double k_0;

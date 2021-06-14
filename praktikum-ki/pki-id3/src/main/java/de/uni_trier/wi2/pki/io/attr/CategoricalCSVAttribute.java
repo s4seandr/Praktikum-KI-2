@@ -42,9 +42,7 @@ public class CategoricalCSVAttribute implements CSVAttribute {
     @Override
     public boolean equals( Object that){
         if (that instanceof CategoricalCSVAttribute) {
-            if(this.value.equals(((CategoricalCSVAttribute) that).getValue()) ){
-                return true;
-            }
+            return this.value.equals(((CategoricalCSVAttribute) that).getValue());
         }
         return false;
     }

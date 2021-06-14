@@ -1,17 +1,17 @@
-/**
- * PRAKTIKUM KUENSTLICHE INTELLIGENZ
- * SOMMERSEMESTER 2021
- *
- * LEHRSTUHL FUER WIRTSCHAFTSINFORMATIK II
- * PROF. DR. RALPH BERGMANN
- * UNIVERSITAET TRIER
- *
- * AUFGABE 2 – Datamining mit Entscheidungsbaeumen
- *
- * Abgabefrist: MONTAG, 14.06.2021 UM 23:59 UHR VIA STUD-IP
- *
- * Gruppenmitglieder: Sebastian Andres, Johannes Lehnerdt
- *
+/*
+  PRAKTIKUM KUENSTLICHE INTELLIGENZ
+  SOMMERSEMESTER 2021
+
+  LEHRSTUHL FUER WIRTSCHAFTSINFORMATIK II
+  PROF. DR. RALPH BERGMANN
+  UNIVERSITAET TRIER
+
+  AUFGABE 2 – Datamining mit Entscheidungsbaeumen
+
+  Abgabefrist: MONTAG, 14.06.2021 UM 23:59 UHR VIA STUD-IP
+
+  Gruppenmitglieder: Sebastian Andres, Johannes Lehnerdt
+
  */
 
 package de.uni_trier.wi2.pki;
@@ -32,6 +32,7 @@ import java.util.*;
 
 public class Main {
 
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws IOException{
 
         List<String[]> input = CSVReader.readCsvToArray("pki-id3/src/main/resources/churn_data.csv", ";", true);
@@ -66,11 +67,11 @@ public class Main {
         ReducedErrorPruner ep = new ReducedErrorPruner();
 
         System.out.println("number of nodes in tree: " + ID3Utils.getNodeList(tree, new ArrayList<>()).size());
-        DecisionTreeNode treeNormal =  CrossValidator.performCrossValidation(csvList, 10, tm, 30);
+        DecisionTreeNode treeNormal =  CrossValidator.performCrossValidation(csvList, 10, tm, 5);
         System.out.println("pruning...");
         ep.prune(tree, csvList, 10);
         System.out.println("number of nodes in tree: " + ID3Utils.getNodeList(tree, new ArrayList<>()).size());
-        DecisionTreeNode treePruned = CrossValidator.performCrossValidation(csvList, 10, tm, 30);
+        DecisionTreeNode treePruned = CrossValidator.performCrossValidation(csvList, 10, tm, 5);
 
         XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\treePruned.xml", treePruned);
         XMLWriter.writeXML("C:\\Users\\johan\\Desktop\\treeNormal.xml", treeNormal);

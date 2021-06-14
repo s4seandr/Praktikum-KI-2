@@ -16,6 +16,8 @@ public class ID3Utils {
      * Create the decision tree given the example and the index of the label attribute.
      *
      * @param examples   The examples to train with. This is a collection of arrays.
+     * @param attributeNames String array, contaning the attribute names.
+     * @param parent
      * @param labelIndex The label of the attribute that should be used as an index.
      * @return The root node of the decision tree
      */
@@ -127,6 +129,7 @@ public class ID3Utils {
             newExamples.add(newRow);
         }
 
+        // remove all examples with a different value
         newExamples.removeIf(e -> !e[attributeIndex].getValue().equals(value));
 
         // remove attribute from row array

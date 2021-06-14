@@ -1,16 +1,15 @@
 package de.uni_trier.wi2.pki.util;
 
-import de.uni_trier.wi2.pki.io.XMLWriter;
 import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.tree.DecisionTreeLeaf;
 import de.uni_trier.wi2.pki.tree.DecisionTreeNode;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
 
+@SuppressWarnings("ALL")
 public class TreeModel implements BiFunction {
 
     private final String[] attrNames;
@@ -19,11 +18,14 @@ public class TreeModel implements BiFunction {
         this.attrNames = attrNames;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object apply(Object trainData, Object labelAttribute) {
+        //noinspection unchecked
         return ID3Utils.createTree((Collection<CSVAttribute[]>) trainData, null, attrNames, (Integer) labelAttribute);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<CSVAttribute[]> predict(List<CSVAttribute[]> ulTestData, DecisionTreeNode tree, int labelAttribute) {
 
         for (CSVAttribute[] row : ulTestData) {
@@ -43,6 +45,7 @@ public class TreeModel implements BiFunction {
                 currentNode = nextNode;
             }
 
+            //noinspection unchecked
             row[labelAttribute].setValue(currentNode.getLabel());
         }
 

@@ -19,6 +19,7 @@ public class CrossValidator {
      * @param labelAttribute the label attribute.
      * @param trainFunction  the function to train the model with.
      * @param numFolds       the number of data folds.
+     * @return the root of the generated tree.
      */
     public static DecisionTreeNode performCrossValidation(List<CSVAttribute[]> dataset, int labelAttribute,
                                                           BiFunction<List<CSVAttribute[]>, Integer, DecisionTreeNode> trainFunction,
@@ -29,10 +30,11 @@ public class CrossValidator {
         // Split dataset
         DecisionTreeNode learnedTree = null;
 
-        List<CSVAttribute[]> trainData = null;
-        List<CSVAttribute[]> ulTestData = null;
-        List<CSVAttribute[]> lTestData = null;
+        List<CSVAttribute[]> trainData;
+        List<CSVAttribute[]> ulTestData;
+        List<CSVAttribute[]> lTestData;
 
+        // inintialize confusion matrix with zeros
         int[][] confusionMatrix = new int[][]{{0,0},{0,0}};
 
         for (int i = 0; i < numFolds; i++) {
@@ -45,6 +47,7 @@ public class CrossValidator {
             // learn from training subset
             learnedTree = trainFunction.apply(trainData, labelAttribute);
 
+            // gather results in list
             foldPerfResults.add(predictionAccuracy(ulTestData, lTestData, learnedTree, labelAttribute));
 
             int[][] newConfusionMatrix = getConfusionMatrix(ulTestData, lTestData, labelAttribute);
@@ -53,7 +56,6 @@ public class CrossValidator {
             confusionMatrix[1][0] += newConfusionMatrix[1][0];
             confusionMatrix[1][1] += newConfusionMatrix[1][1];
         }
-
 
         int tp = confusionMatrix[0][0];
         int fp = confusionMatrix[0][1];
@@ -64,11 +66,15 @@ public class CrossValidator {
         float posRecall = (float) tp / (tp + fn);
         float negRecall = (float) tn / (tn + fp);
 
-        double averageAccuracy = foldPerfResults.stream().mapToDouble(d -> d).average().orElse(0.0);
+        double averageAccuracy = foldPerfResults.stream()
+                .mapToDouble(d -> d)
+                .average()
+                .orElse(0.0);
         double standardDeviation = Math.sqrt((foldPerfResults.stream()
                 .mapToDouble(d -> d)
                 .map(x -> Math.pow((x - averageAccuracy),2))
                 .sum()) / foldPerfResults.size());
+
         System.out.println("accuracy: " + averageAccuracy * 100 + "% +/- " + standardDeviation * 100 + "%");
         System.out.println();
         System.out.println("                  true 1   |    true 0  |   class precision");

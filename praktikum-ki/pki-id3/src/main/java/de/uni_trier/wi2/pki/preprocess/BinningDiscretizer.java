@@ -4,8 +4,6 @@ import de.uni_trier.wi2.pki.io.attr.CSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.CategoricalCSVAttribute;
 import de.uni_trier.wi2.pki.io.attr.ContinuousCSVAttribute;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

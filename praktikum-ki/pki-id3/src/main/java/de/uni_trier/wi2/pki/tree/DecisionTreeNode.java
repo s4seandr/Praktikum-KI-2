@@ -14,7 +14,7 @@ public class DecisionTreeNode {
     /**
      * The attribute label.
      */
-    protected String label;
+    protected final String label;
 
 
     protected String[] attributeNames;

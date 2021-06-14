@@ -3,7 +3,7 @@ package de.uni_trier.wi2.pki.tree;
 import org.jdom.Element;
 
 /**
- * Subclass of DecisionTreeNode, adds labels
+ * Subclass of DecisionTreeNode, overwrites XML output
  *
  */
 public class DecisionTreeLeaf extends DecisionTreeNode {
