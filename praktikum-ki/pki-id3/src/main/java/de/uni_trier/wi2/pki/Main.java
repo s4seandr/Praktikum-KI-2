@@ -61,6 +61,7 @@ public class Main {
 
         System.out.println("Information gain for attributes:");
         System.out.println(EntropyUtils.calcInformationGain(csvList, 10));
+        System.out.println();
 
         TreeModel tm = new TreeModel(attrNames);
 

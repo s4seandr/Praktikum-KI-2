@@ -18,14 +18,12 @@ public class TreeModel implements BiFunction {
         this.attrNames = attrNames;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Object apply(Object trainData, Object labelAttribute) {
         //noinspection unchecked
         return ID3Utils.createTree((Collection<CSVAttribute[]>) trainData, null, attrNames, (Integer) labelAttribute);
     }
 
-    @SuppressWarnings("unchecked")
     public static List<CSVAttribute[]> predict(List<CSVAttribute[]> ulTestData, DecisionTreeNode tree, int labelAttribute) {
 
         for (CSVAttribute[] row : ulTestData) {
